@@ -24,20 +24,20 @@ def snap(mainmodule, snapshot):
     # mainmodule.upgrade()
     os.rename(name + '.py', 'old' + name)
     doss.serialize(mainmodule.get_system(), 
-		   mainmodule.get_module_names_used_persistently(),
-		   file(name + '.py', 'w'))
+                   mainmodule.get_module_names_used_persistently(),
+                   file(name + '.py', 'w'))
 
 def main(mainmodule, snapshot):
     mainmodule.set_system(snapshot.root)
-    # import changes		# XXX temporary
+    # import changes            # XXX temporary
     try:
-	try:
-	    start(mainmodule)
-	except KeyboardInterrupt:
-	    print '^C received, shutting down server'
-	    server.socket.close()
+        try:
+            start(mainmodule)
+        except KeyboardInterrupt:
+            print '^C received, shutting down server'
+            server.socket.close()
     finally:
-	snap(mainmodule, snapshot)
+        snap(mainmodule, snapshot)
 
 
 if __name__ == '__main__':

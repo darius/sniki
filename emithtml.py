@@ -3,34 +3,34 @@ import cgi
 
 def emit(obj, attribute=False):
     if type(obj) == list:
-	return ''.join([emit(element) for element in obj])
+        return ''.join([emit(element) for element in obj])
     if type(obj) == str:
-	return cgi.escape(obj, attribute)
+        return cgi.escape(obj, attribute)
     if type(obj) == type(emit):
-	return obj()		# XXX what if attribute=True?
+        return obj()            # XXX what if attribute=True?
     raise 'Bad type', obj
 
 def emit_attributes(dict):
     attrs = []
     for key in dict:
-	attrs.append(' %s="%s"' % (cgi.escape(key), 
-				   emit(dict[key], attribute=True)))
+        attrs.append(' %s="%s"' % (cgi.escape(key), 
+                                   emit(dict[key], attribute=True)))
     return ''.join(attrs)
 
 def make_tag_emitter(tag):
     def make(_='', **kwargs):
-	def emitter():
-	    return '<%s%s>%s</%s>' % (tag,
-				      emit_attributes(kwargs), emit(_),
-				      tag)
-	return emitter
+        def emitter():
+            return '<%s%s>%s</%s>' % (tag,
+                                      emit_attributes(kwargs), emit(_),
+                                      tag)
+        return emitter
     return make
 
 def make_lonetag_emitter(tag):
     def make(**kwargs):
-	def emitter():
-	    return '<%s%s>' % (tag, emit_attributes(kwargs))
-	return emitter
+        def emitter():
+            return '<%s%s>' % (tag, emit_attributes(kwargs))
+        return emitter
     return make
 
 A        = make_tag_emitter('a')
