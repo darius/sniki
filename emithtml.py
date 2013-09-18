@@ -8,7 +8,7 @@ def emit(obj, attribute=False):
         return cgi.escape(obj, attribute)
     if type(obj) == type(emit):
         return obj()            # XXX what if attribute=True?
-    raise 'Bad type', obj
+    raise Exception('Bad type', obj)
 
 def emit_attributes(dict):
     attrs = []
