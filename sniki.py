@@ -7,6 +7,8 @@ from emithtml import A, Br, Form, H2, Hr, I, Input, Li, P, Pre, \
 import triples
 import webserver
 
+import unitcalc; unitcalc.loadme()
+
 
 # The data model and the persistent root.
 
@@ -157,10 +159,11 @@ class Page:
 pat_paragraph = r'\r?\n\r?\n'
 pat_uri       = r'http:[^ \r\n()]+' # XXX make this more accurate
 pat_tabulate  = r'\[tabulate\s'
+pat_calc      = r'\[calc\s'
 pat_slink     = r'\[[^\]]+\]'             # simple link
 pat_escape    = r'\\.'
-pat_token     = '|'.join([pat_paragraph, pat_uri, pat_tabulate, pat_slink,
-                          pat_escape])
+pat_token     = '|'.join([pat_paragraph, pat_uri, pat_tabulate, pat_calc,
+                          pat_slink, pat_escape])
 def html_format(src):
     out = []
     while src != '':
@@ -177,6 +180,9 @@ def html_format(src):
         elif sre.match(pat_tabulate, token):
             qtriples, src = parse_tabulate(src)
             tabulate(out, qtriples)
+        elif sre.match(pat_calc, token):
+            parsed, src = parse_calc(src)
+            eval_calc(out, parsed)
         elif sre.match(pat_slink, token):
             contents = token[1:-1].split()
             if 0 == len(contents):
@@ -233,6 +239,21 @@ def parse_tabulate(src):
     qtriples = p.parse_triples()
     p._eat(']')
     return qtriples, p.r
+
+def parse_calc(src):
+    i = src.find(']')
+    if i == -1:
+        return None, src
+    else:
+        return src[:i], src[i+1:]
+
+def eval_calc(out, parsed):
+    try:
+        result = unitcalc.calc(parsed)
+    except Exception, e:
+        print 'oops', e
+        result = str(e)
+    out.append(str(result))
 
 
 # The web UI
